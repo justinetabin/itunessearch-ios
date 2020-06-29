@@ -1,5 +1,5 @@
 //
-//  MoviesResult.swift
+//  StoreResult.swift
 //  iTunesSearch
 //
 //  Created by Justine Tabin on 6/29/20.

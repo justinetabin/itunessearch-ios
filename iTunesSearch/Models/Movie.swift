@@ -8,7 +8,7 @@
 
 import Foundation
 
-struct Movie: Codable {
+struct Movie: Codable, Equatable {
     var trackId: Int
     var collectionName: String?
     var artistName: String

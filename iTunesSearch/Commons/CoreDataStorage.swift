@@ -13,7 +13,7 @@ final class CoreDataStorage {
     private var persistentContainer: NSPersistentContainer
     
     init() {
-        persistentContainer = NSPersistentContainer(name: "iTunesStore")
+        persistentContainer = NSPersistentContainer(name: "iTunesSearch")
         persistentContainer.loadPersistentStores { (_, error) in
             if let error = error as NSError? {
                 fatalError("CoreData: \(error) - \(error.userInfo)")

@@ -8,8 +8,12 @@
 
 /* Begin PBXBuildFile section */
 		9F937994703E5E818A9FEBCE /* Pods_iTunesSearchTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AAB0509F4750F354B61FE1CC /* Pods_iTunesSearchTests.framework */; };
-		CF2DE62324A978A0003E2A07 /* MoviesResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF2DE62224A978A0003E2A07 /* MoviesResult.swift */; };
+		CF2DE62324A978A0003E2A07 /* StoreResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF2DE62224A978A0003E2A07 /* StoreResult.swift */; };
 		CF2DE62524A97DBE003E2A07 /* LookupQuery.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF2DE62424A97DBE003E2A07 /* LookupQuery.swift */; };
+		CF2DE62724A9863D003E2A07 /* Page.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF2DE62624A9863D003E2A07 /* Page.swift */; };
+		CF2DE62924A98774003E2A07 /* Movie+CoreData.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF2DE62824A98774003E2A07 /* Movie+CoreData.swift */; };
+		CF2DE62C24A98890003E2A07 /* iTunesSearch.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = CF2DE62A24A98890003E2A07 /* iTunesSearch.xcdatamodeld */; };
+		CF2DE62E24AA1E7C003E2A07 /* MovieCoreDataStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF2DE62D24AA1E7C003E2A07 /* MovieCoreDataStoreTests.swift */; };
 		CFE4EC9224A8CB36005BAB87 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFE4EC9124A8CB36005BAB87 /* AppDelegate.swift */; };
 		CFE4EC9424A8CB36005BAB87 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFE4EC9324A8CB36005BAB87 /* SceneDelegate.swift */; };
 		CFE4EC9624A8CB36005BAB87 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFE4EC9524A8CB36005BAB87 /* ViewController.swift */; };
@@ -47,8 +51,12 @@
 		648AF167946CC0BD5F545C16 /* Pods-iTunesSearch.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-iTunesSearch.release.xcconfig"; path = "Target Support Files/Pods-iTunesSearch/Pods-iTunesSearch.release.xcconfig"; sourceTree = "<group>"; };
 		AAB0509F4750F354B61FE1CC /* Pods_iTunesSearchTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_iTunesSearchTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		CCE7E1FA9A9A3D9C63AFECCC /* Pods-iTunesSearchTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-iTunesSearchTests.release.xcconfig"; path = "Target Support Files/Pods-iTunesSearchTests/Pods-iTunesSearchTests.release.xcconfig"; sourceTree = "<group>"; };
-		CF2DE62224A978A0003E2A07 /* MoviesResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoviesResult.swift; sourceTree = "<group>"; };
+		CF2DE62224A978A0003E2A07 /* StoreResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreResult.swift; sourceTree = "<group>"; };
 		CF2DE62424A97DBE003E2A07 /* LookupQuery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LookupQuery.swift; sourceTree = "<group>"; };
+		CF2DE62624A9863D003E2A07 /* Page.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Page.swift; sourceTree = "<group>"; };
+		CF2DE62824A98774003E2A07 /* Movie+CoreData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Movie+CoreData.swift"; sourceTree = "<group>"; };
+		CF2DE62B24A98890003E2A07 /* iTunesSearch.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = iTunesSearch.xcdatamodel; sourceTree = "<group>"; };
+		CF2DE62D24AA1E7C003E2A07 /* MovieCoreDataStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovieCoreDataStoreTests.swift; sourceTree = "<group>"; };
 		CFE4EC8E24A8CB36005BAB87 /* iTunesSearch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iTunesSearch.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CFE4EC9124A8CB36005BAB87 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		CFE4EC9324A8CB36005BAB87 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -171,6 +179,7 @@
 		CFE4ECB524A8CC28005BAB87 /* Commons */ = {
 			isa = PBXGroup;
 			children = (
+				CFE4ECBF24A8D212005BAB87 /* CoreDataStorage.swift */,
 				CFE4ECC724A96F33005BAB87 /* HTTPClient.swift */,
 			);
 			path = Commons;
@@ -183,6 +192,7 @@
 				CFE4EC9A24A8CB39005BAB87 /* Assets.xcassets */,
 				CFE4EC9C24A8CB39005BAB87 /* LaunchScreen.storyboard */,
 				CFE4EC9F24A8CB39005BAB87 /* Info.plist */,
+				CF2DE62A24A98890003E2A07 /* iTunesSearch.xcdatamodeld */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -192,7 +202,6 @@
 			children = (
 				CFE4ECC324A968C2005BAB87 /* iTunesStoreApi.swift */,
 				CFE4ECBA24A8CD23005BAB87 /* MovieCoreDataStore.swift */,
-				CFE4ECBF24A8D212005BAB87 /* CoreDataStorage.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -216,9 +225,11 @@
 			isa = PBXGroup;
 			children = (
 				CFE4ECC124A8D57F005BAB87 /* Movie.swift */,
+				CF2DE62824A98774003E2A07 /* Movie+CoreData.swift */,
 				CFE4ECC524A96DDE005BAB87 /* SearchQuery.swift */,
 				CF2DE62424A97DBE003E2A07 /* LookupQuery.swift */,
-				CF2DE62224A978A0003E2A07 /* MoviesResult.swift */,
+				CF2DE62224A978A0003E2A07 /* StoreResult.swift */,
+				CF2DE62624A9863D003E2A07 /* Page.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -227,6 +238,7 @@
 			isa = PBXGroup;
 			children = (
 				CFE4ECCC24A973D0005BAB87 /* iTunesStoreApiTests.swift */,
+				CF2DE62D24AA1E7C003E2A07 /* MovieCoreDataStoreTests.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -411,15 +423,18 @@
 				CFE4ECCF24A9747E005BAB87 /* Constants.swift in Sources */,
 				CFE4ECC024A8D212005BAB87 /* CoreDataStorage.swift in Sources */,
 				CFE4ECC624A96DDE005BAB87 /* SearchQuery.swift in Sources */,
+				CF2DE62724A9863D003E2A07 /* Page.swift in Sources */,
 				CFE4ECBB24A8CD23005BAB87 /* MovieCoreDataStore.swift in Sources */,
 				CFE4EC9624A8CB36005BAB87 /* ViewController.swift in Sources */,
 				CFE4EC9224A8CB36005BAB87 /* AppDelegate.swift in Sources */,
+				CF2DE62924A98774003E2A07 /* Movie+CoreData.swift in Sources */,
 				CFE4ECC824A96F33005BAB87 /* HTTPClient.swift in Sources */,
 				CFE4EC9424A8CB36005BAB87 /* SceneDelegate.swift in Sources */,
-				CF2DE62324A978A0003E2A07 /* MoviesResult.swift in Sources */,
+				CF2DE62324A978A0003E2A07 /* StoreResult.swift in Sources */,
 				CF2DE62524A97DBE003E2A07 /* LookupQuery.swift in Sources */,
 				CFE4ECC424A968C2005BAB87 /* iTunesStoreApi.swift in Sources */,
 				CFE4ECBE24A8CED8005BAB87 /* MovieWorker.swift in Sources */,
+				CF2DE62C24A98890003E2A07 /* iTunesSearch.xcdatamodeld in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -430,6 +445,7 @@
 				CFE4ECCD24A973D0005BAB87 /* iTunesStoreApiTests.swift in Sources */,
 				CFE4ECA924A8CB39005BAB87 /* iTunesSearchTests.swift in Sources */,
 				CFE4ECD124A974C1005BAB87 /* Constants.swift in Sources */,
+				CF2DE62E24AA1E7C003E2A07 /* MovieCoreDataStoreTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -692,6 +708,19 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		CF2DE62A24A98890003E2A07 /* iTunesSearch.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				CF2DE62B24A98890003E2A07 /* iTunesSearch.xcdatamodel */,
+			);
+			currentVersion = CF2DE62B24A98890003E2A07 /* iTunesSearch.xcdatamodel */;
+			path = iTunesSearch.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
 	};
 	rootObject = CFE4EC8624A8CB36005BAB87 /* Project object */;
 }

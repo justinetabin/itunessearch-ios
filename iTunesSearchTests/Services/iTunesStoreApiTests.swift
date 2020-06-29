@@ -58,7 +58,7 @@ class iTunesStoreApiTests: XCTestCase {
         }
         
         // then
-        waitForExpectations(timeout: 1.0, handler: nil)
+        waitForExpectations(timeout: 60.0, handler: nil)
         XCTAssertNotNil(gotMoviesResult)
         XCTAssertNil(gotError)
     }
