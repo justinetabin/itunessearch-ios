@@ -1,0 +1,4 @@
+Pods
+*.lock
+*.xcworkspace
+.DS_Store
