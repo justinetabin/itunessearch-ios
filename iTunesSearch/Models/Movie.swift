@@ -8,9 +8,9 @@
 
 import Foundation
 
-struct Movie {
+struct Movie: Codable {
     var trackId: Int
-    var collectionName: String
+    var collectionName: String?
     var artistName: String
     var trackName: String
     var previewUrl: String
