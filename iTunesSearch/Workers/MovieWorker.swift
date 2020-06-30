@@ -39,4 +39,5 @@ protocol MovieDataStore {
     func upsertMovie(movieToUpsert: Movie, completion: @escaping (Bool) -> Void)
     func getMovie(trackId: Int, completion: @escaping (Movie?) -> Void)
     func listMovie(page: Page, completion: @escaping ([Movie]?) -> Void)
+    func deleteMovie(movie: Movie, completion: @escaping (Bool) -> Void)
 }

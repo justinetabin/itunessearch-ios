@@ -37,8 +37,6 @@ class MovieCoreDataStoreTests: XCTestCase {
                                currency: "myCurrency",
                                trackTimeMillis: 60000)
         self.sut = MovieCoreDataStore(coreDataStorage: coreDataStorage)
-        
-        self.sut.upsertMovie(movieToUpsert: self.testMovie) { (success) in }
     }
 
     override func tearDown() {
@@ -49,36 +47,49 @@ class MovieCoreDataStoreTests: XCTestCase {
     func testGet_whenGivenTrackId_thenShouldMatchMovie() {
         // given
         let expect = self.expectation(description: "Wait for getMovie()")
+        expect.expectedFulfillmentCount = 2
         let expectedMovie = self.testMovie
         
         // when
         var gotMovie: Movie?
-        self.sut.getMovie(trackId: 0) { (movie) in
-            gotMovie = movie
-            expect.fulfill()
+        self.sut.upsertMovie(movieToUpsert: self.testMovie) { (success) in
+            self.sut.getMovie(trackId: expectedMovie!.trackId) { (movie) in
+                gotMovie = movie
+                expect.fulfill()
+                self.sut.deleteMovie(movie: self.testMovie) { (_) in
+                    expect.fulfill()
+                }
+            }
         }
         
         // then
-        self.waitForExpectations(timeout: 1.0, handler: nil)
+        self.waitForExpectations(timeout: 3.0, handler: nil)
         XCTAssertEqual(gotMovie, expectedMovie)
     }
     
     func testList_whenGivenFirstPage_thenShouldMatchMovies() {
         // given
         let expect = expectation(description: "Wait for listMovies()")
+        expect.expectedFulfillmentCount = 2
         let givenPage = Page(skip: 0)
-        let expectedMovies: [Movie] = [self.testMovie]
+        let expectedMovie: Movie = self.testMovie
         
         // when
         var gotMovies: [Movie]?
-        self.sut.listMovie(page: givenPage) { (movies) in
-            gotMovies = movies
-            expect.fulfill()
+        self.sut.upsertMovie(movieToUpsert: self.testMovie) { (success) in
+            self.sut.listMovie(page: givenPage) { (movies) in
+                gotMovies = movies
+                expect.fulfill()
+                self.sut.deleteMovie(movie: self.testMovie) { (_) in
+                    expect.fulfill()
+                }
+            }
         }
         
         // then
-        self.waitForExpectations(timeout: 1.0, handler: nil)
-        XCTAssertEqual(gotMovies, expectedMovies)
+        self.waitForExpectations(timeout: 3.0, handler: nil)
+        XCTAssertNotNil(gotMovies)
+        XCTAssert(gotMovies!.contains(expectedMovie))
     }
 
 }

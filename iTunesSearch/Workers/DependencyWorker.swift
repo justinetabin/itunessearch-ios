@@ -14,7 +14,7 @@ protocol WorkerFactory {
 }
 
 protocol ViewControllerFactory {
-    
+    func makeListMoviesScene() -> ListMoviesViewController
 }
 
 /*
@@ -48,5 +48,8 @@ extension DependencyWorker: WorkerFactory {
 }
 
 extension DependencyWorker: ViewControllerFactory {
-    
+    func makeListMoviesScene() -> ListMoviesViewController {
+        let viewModel = ListMoviesViewModel(worker: self.makeCacheMovieDecorator())
+        return ListMoviesViewController(factory: self, viewModel: viewModel)
+    }
 }

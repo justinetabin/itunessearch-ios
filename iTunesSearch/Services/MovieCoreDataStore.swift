@@ -38,8 +38,8 @@ class MovieCoreDataStore: MovieDataStore {
         self.coreDataStorage.getBackgroundContext { (context) in
             do {
                 let request: NSFetchRequest<MovieEntity> = MovieEntity.fetchRequest()
-                request.fetchLimit = page.limit
-                request.fetchOffset = page.skip
+//                request.fetchLimit = page.limit
+//                request.fetchOffset = page.skip
                 let result = try request.execute()
                 completion(result.map { $0.toMovie() })
             } catch _ {
@@ -61,6 +61,25 @@ class MovieCoreDataStore: MovieDataStore {
                 }
                 try context.save()
                 completion(true)
+            } catch _ {
+                completion(false)
+            }
+        }
+    }
+    
+    func deleteMovie(movie: Movie, completion: @escaping (Bool) -> Void) {
+        self.coreDataStorage.getBackgroundContext { (context) in
+            do {
+                let request: NSFetchRequest<MovieEntity> = MovieEntity.fetchRequest()
+                request.predicate = NSPredicate(format: "trackId == %i", Int32(movie.trackId))
+                let result = try request.execute()
+                if let movieEntity = result.first {
+                    context.delete(movieEntity)
+                    try context.save()
+                    completion(true)
+                } else {
+                    completion(false)
+                }
             } catch _ {
                 completion(false)
             }

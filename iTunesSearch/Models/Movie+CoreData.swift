@@ -13,7 +13,7 @@ extension MovieEntity {
     
     convenience init(movie: Movie, insertInto context: NSManagedObjectContext) {
         self.init(context: context)
-        
+        self.from(movie: movie)
     }
     
     func from(movie: Movie) {

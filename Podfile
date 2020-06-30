@@ -9,6 +9,7 @@ target 'iTunesSearch' do
   pod 'RxSwift'
   pod 'RxCocoa'
   pod 'Kingfisher'
+  pod 'SnapKit'
 
   target 'iTunesSearchTests' do
     inherit! :search_paths

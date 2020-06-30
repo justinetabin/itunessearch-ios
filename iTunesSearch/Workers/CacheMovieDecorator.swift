@@ -25,7 +25,7 @@ class CacheMovieDecorator: CacheMovieProtocols {
                                  -> view
                  */
                 movies.forEach { (movie) in
-                    self.movieDataStore.upsertMovie(movieToUpsert: movie) { (_) in }
+                    self.movieDataStore.upsertMovie(movieToUpsert: movie) { (result) in }
                 }
                 completion(movies)
             } else {
