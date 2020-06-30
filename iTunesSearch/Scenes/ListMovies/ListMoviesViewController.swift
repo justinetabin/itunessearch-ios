@@ -23,10 +23,20 @@ class ListMoviesViewController: BaseViewController<ListMoviesViewModel> {
         return view
     }()
     
+    var loadingActivityIndicatorView: UIActivityIndicatorView = {
+        let view = UIActivityIndicatorView(style: .large)
+        return view
+    }()
+    
     fileprivate func setupSubviews() {
         self.view.addSubview(self.tableView)
+        self.view.addSubview(self.loadingActivityIndicatorView)
         
         self.tableView.snp.makeConstraints { (make) in
+            make.edges.equalToSuperview()
+        }
+        
+        self.loadingActivityIndicatorView.snp.makeConstraints { (make) in
             make.edges.equalToSuperview()
         }
     }
@@ -36,6 +46,15 @@ class ListMoviesViewController: BaseViewController<ListMoviesViewModel> {
         self.tableView.register(ListMoviesTableCell.self, forCellReuseIdentifier: ListMoviesTableCell.reuseIdentifier)
         self.tableView.dataSource = self
         self.tableView.delegate = self
+        self.tableView.separatorStyle = .none
+        self.tableView.tableFooterView = UIView()
+
+    }
+    
+    fileprivate func setupNav() {
+        self.navigationController?.navigationBar.prefersLargeTitles = true
+        self.navigationController?.navigationBar.tintColor = Colors.gray
+        self.title = "iTunesSearch"
     }
     
     fileprivate func bindViews() {
@@ -50,6 +69,21 @@ class ListMoviesViewController: BaseViewController<ListMoviesViewModel> {
                 self?.pullToRefreshControl.endRefreshing()
                 self?.tableView.reloadData()
             }.disposed(by: self.disposeBag)
+        
+        self.viewModel.output.showLoadingActivity
+            .observeOn(MainScheduler.instance)
+            .bind { [weak self] (loading) in
+                guard let self = self else { return }
+                if loading {
+                    self.loadingActivityIndicatorView.startAnimating()
+                    self.loadingActivityIndicatorView.isHidden = false
+                    self.tableView.isHidden = true
+                } else {
+                    self.loadingActivityIndicatorView.stopAnimating()
+                    self.loadingActivityIndicatorView.isHidden = true
+                    self.tableView.isHidden = false
+                }
+            }.disposed(by: self.disposeBag)
     }
     
     override func viewDidLoad() {
@@ -59,6 +93,11 @@ class ListMoviesViewController: BaseViewController<ListMoviesViewModel> {
         self.setupTableView()
         self.bindViews()
         self.viewModel.input.viewDidLoad.accept(())
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        self.setupNav()
     }
 }
 
@@ -77,16 +116,23 @@ extension ListMoviesViewController: UITableViewDataSource, UITableViewDelegate {
         let width = tableView.frame.width
         let rowIndex = indexPath.row
         let movie = self.viewModel.movies[rowIndex]
-        cell.artWorkImageView.setImage(url: self.viewModel.getAlbumArt(at: rowIndex, with: width))
+        cell.artWorkImageView.setImage(url: self.viewModel.getAlbumArt(at: rowIndex, with: Int(width)))
         cell.trackNameLabel.text = movie.trackName
         cell.genreLabel.text = movie.primaryGenreName
         cell.advisoryRating.text = movie.contentAdvisoryRating
-        cell.shorDesc.text = movie.shortDescription
+        cell.shorDesc.attributedText = movie.shortDescription?.lineSpaced(4)
         return cell
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         let width = Int(tableView.frame.width / 3)
         return CGFloat(width) * 1.5
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
+        let movie = self.viewModel.movies[indexPath.row]
+        let showMovieScene = self.factory.makeShowMovieScene(movie: movie)
+        self.show(showMovieScene, sender: nil)
     }
 }

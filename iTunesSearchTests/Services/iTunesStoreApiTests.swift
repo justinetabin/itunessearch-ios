@@ -46,7 +46,7 @@ class iTunesStoreApiTests: XCTestCase {
     func testLookup_whenGivenQueryBy_thenResultsNotNil() {
         // given
         let expect = expectation(description: "Wait for lookup() to return a value")
-        let query = LookupQuery(id: 978943481)
+        let query = LookupQuery(id: 978943481, country: "au")
                 
         // when
         var gotMoviesResult: StoreResult<[Movie]>?

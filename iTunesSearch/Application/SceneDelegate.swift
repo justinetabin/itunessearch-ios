@@ -24,7 +24,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let dependencyWorker = DependencyWorker()
         self.window = UIWindow(windowScene: scene)
         let entryScene = dependencyWorker.makeListMoviesScene()
-        self.window?.rootViewController = UINavigationController(rootViewController: entryScene)
+        let nav = UINavigationController(rootViewController: entryScene)
+        self.window?.rootViewController = nav
         self.window?.makeKeyAndVisible()
     }
 

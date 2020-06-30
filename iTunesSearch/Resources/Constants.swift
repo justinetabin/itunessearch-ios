@@ -16,6 +16,8 @@ struct Api {
 struct Colors {
     static var bg = UIColor.systemBackground
     static var gray = UIColor.systemGray
+    static var white = UIColor.white
+    static var black = UIColor.black
 }
 
 struct Fonts {

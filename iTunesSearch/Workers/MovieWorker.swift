@@ -23,7 +23,7 @@ class MovieWorker: CacheMovieProtocols {
     }
     
     func getMovie(trackId: Int, completion: @escaping (Movie?) -> Void) {
-        let query = LookupQuery(id: trackId)
+        let query = LookupQuery(id: trackId, country: "au")
         self.storeApi.lookup(query: query) { (result, error) in
             completion(result?.results.first)
         }

@@ -10,4 +10,5 @@ import Foundation
 
 struct LookupQuery {
     var id: Int
+    var country: String
 }

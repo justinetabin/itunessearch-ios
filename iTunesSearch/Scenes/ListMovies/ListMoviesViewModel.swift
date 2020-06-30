@@ -23,7 +23,8 @@ class ListMoviesViewModel: BaseViewModel, ViewModelType {
      View Outputs
      */
     var output = Output(
-        showMovies: PublishRelay()
+        showMovies: PublishRelay(),
+        showLoadingActivity: PublishRelay()
     )
     
     var worker: CacheMovieDecorator
@@ -35,11 +36,13 @@ class ListMoviesViewModel: BaseViewModel, ViewModelType {
         
         self.input.viewDidLoad.bind { [weak self] (_) in
             guard let self = self else { return }
+            self.output.showLoadingActivity.accept(true)
             self.worker.searchMovies { (movies) in
                 if let movies = movies {
                     self.movies = movies
                     self.output.showMovies.accept(())
                 }
+                self.output.showLoadingActivity.accept(false)
             }
         }.disposed(by: self.disposeBag)
         
@@ -54,8 +57,7 @@ class ListMoviesViewModel: BaseViewModel, ViewModelType {
         }.disposed(by: self.disposeBag)
     }
     
-    func getAlbumArt(at index: Int, with width: CGFloat) -> String {
-        let width = Int(width)
+    func getAlbumArt(at index: Int, with width: Int) -> String {
         return self.movies[index].artworkUrl100.replacingOccurrences(of: "100x100", with: "\(width)x\(width)")
     }
 }
@@ -69,5 +71,6 @@ extension ListMoviesViewModel {
     
     struct Output {
         var showMovies: PublishRelay<()>
+        var showLoadingActivity: PublishRelay<(Bool)>
     }
 }

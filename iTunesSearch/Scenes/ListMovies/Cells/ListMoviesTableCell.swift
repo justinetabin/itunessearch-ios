@@ -12,8 +12,8 @@ import UIKit
 class ListMoviesTableCell: UITableViewCell {
     static var reuseIdentifier = "ListMoviesTableCell"
     
-    var artWorkImageView: UIImageView = {
-        let view = UIImageView()
+    var artWorkImageView: PlaceholderImageView = {
+        let view = PlaceholderImageView(frame: .zero)
         view.clipsToBounds = true
         view.contentMode = .scaleAspectFill
         return view
@@ -74,7 +74,7 @@ class ListMoviesTableCell: UITableViewCell {
         }
         
         self.trackNameLabel.snp.makeConstraints { (make) in
-            make.left.equalTo(self.artWorkImageView.snp.right).offset(10)
+            make.left.equalTo(self.artWorkImageView.snp.right).offset(15)
             make.top.right.equalToSuperview().inset(10)
         }
         
