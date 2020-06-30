@@ -10,6 +10,6 @@ import Foundation
 
 struct SearchQuery {
     var term: String
-    var query: String
+    var country: String
     var media: String
 }

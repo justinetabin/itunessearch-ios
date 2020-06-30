@@ -1,5 +1,5 @@
 //
-//  MovieStoreWorker.swift
+//  MovieWorker.swift
 //  iTunesSearch
 //
 //  Created by Justine Tabin on 6/28/20.
@@ -8,8 +8,31 @@
 
 import Foundation
 
-class MovieStoreWorker {
+class MovieWorker: CacheMovieProtocols {
+    var storeApi: StoreApi
     
+    init(storeApi: StoreApi) {
+        self.storeApi = storeApi
+    }
+    
+    func searchMovies(completion: @escaping ([Movie]?) -> Void) {
+        let query = SearchQuery(term: "star", country: "au", media: "movie")
+        self.storeApi.search(query: query) { (result, error) in
+            completion(result?.results)
+        }
+    }
+    
+    func getMovie(trackId: Int, completion: @escaping (Movie?) -> Void) {
+        let query = LookupQuery(id: trackId)
+        self.storeApi.lookup(query: query) { (result, error) in
+            completion(result?.results.first)
+        }
+    }
+}
+
+protocol StoreApi {
+    func search(query: SearchQuery, completion: @escaping (StoreResult<[Movie]>?, Error?) -> Void)
+    func lookup(query: LookupQuery, completion: @escaping (StoreResult<[Movie]>?, Error?) -> Void)
 }
 
 protocol MovieDataStore {
