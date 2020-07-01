@@ -121,6 +121,7 @@ extension ListMoviesViewController: UITableViewDataSource, UITableViewDelegate {
         cell.genreLabel.text = movie.primaryGenreName
         cell.advisoryRating.text = movie.contentAdvisoryRating
         cell.shorDesc.attributedText = movie.shortDescription?.lineSpaced(4)
+        cell.priceLabel.text = self.viewModel.getTrackPrice(at: rowIndex)
         return cell
     }
     

@@ -60,6 +60,11 @@ class ListMoviesViewModel: BaseViewModel, ViewModelType {
     func getAlbumArt(at index: Int, with width: Int) -> String {
         return self.movies[index].artworkUrl100.replacingOccurrences(of: "100x100", with: "\(width)x\(width)")
     }
+    
+    func getTrackPrice(at index: Int) -> String {
+        let movie = self.movies[index]
+        return movie.trackPrice.currencyValue(currencyCode: movie.currency)
+    }
 }
 
 extension ListMoviesViewModel {

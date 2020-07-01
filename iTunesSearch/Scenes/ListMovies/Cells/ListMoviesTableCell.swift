@@ -49,6 +49,16 @@ class ListMoviesTableCell: UITableViewCell {
         return view
     }()
     
+    var priceLabel: PaddingLabel = {
+        let view = PaddingLabel()
+        view.padding = UIEdgeInsets(top: 2.5, left: 5, bottom: 2.5, right: 5)
+        view.font = Fonts.small
+        view.layer.borderColor = Colors.gray.cgColor
+        view.layer.borderWidth = 1
+        view.layer.cornerRadius = 4
+        return view
+    }()
+    
     var containerView: UIView = {
         let view = UIView()
         return view
@@ -63,6 +73,7 @@ class ListMoviesTableCell: UITableViewCell {
         self.containerView.addSubview(self.advisoryRating)
         self.containerView.addSubview(self.genreLabel)
         self.containerView.addSubview(self.shorDesc)
+        self.containerView.addSubview(self.priceLabel)
         
         self.containerView.snp.makeConstraints { (make) in
             make.edges.equalToSuperview()
@@ -92,6 +103,11 @@ class ListMoviesTableCell: UITableViewCell {
         self.shorDesc.snp.makeConstraints { (make) in
             make.left.right.equalTo(self.trackNameLabel)
             make.top.equalTo(self.genreLabel.snp.bottom).offset(5)
+        }
+        
+        self.priceLabel.snp.makeConstraints { (make) in
+            make.left.equalTo(self.advisoryRating.snp.right).offset(10)
+            make.centerY.equalTo(self.advisoryRating.snp.centerY)
         }
     }
     
