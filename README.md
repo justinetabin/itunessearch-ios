@@ -2,7 +2,7 @@
 * A simple master-detail app that communicates with iTunes Search public APIs. It displays movies in a list manner and shows a movie for it's details with trailer preview to autoplay.
 
 # iTunesStore API
-* Check it out the <a href="https://affiliate.itunes.apple.com/resources/documentation/itunes-store-web-service-search-api/#searching">**Documentation**</a>.
+* Check out the <a href="https://affiliate.itunes.apple.com/resources/documentation/itunes-store-web-service-search-api/#searching">**Documentation**</a>.
 
 # Architecture Overview
 This project's architecture highlights separation of concerns.
