@@ -40,6 +40,7 @@ This project's architecture highlights separation of concerns.
 # Room for improvements
 * Unit tests for ViewModels, ViewControllers
 * Some view logic in viewmodels would also be good to be shared and moved on a worker
+* Pagination
 
 # Requirements
 * Xcode Version 11.3+ Swift 5.0+
