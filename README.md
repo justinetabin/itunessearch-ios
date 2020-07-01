@@ -15,17 +15,27 @@ This project's architecture highlights separation of concerns.
 
 ### Scene Layer
 - The UI that can be easily added or swapped in and out without changing any business logic.
+  - Used MVVM but with a much stricter ViewModels since it will only consists of purely view logics / view transformations
+  - MVVM is scaleable, easier to read and works well with functional programming paradigms
 
 # Dependencies
 * Caching via CoreData
-  - I used a wrapper to wrap a basic iTunesApi service so we are flexible and testable
-  - I chose to use this for simplicity and under the hood ready-to-use background threading
+  - Used a wrapper to wrap a basic iTunesApi service so we are flexible and testable
+  - For simplicity and under the hood ready-to-use background threading
 * RxSwift / RxRelay / RxCocoa
-  - I chose to use this mainly in View <-> ViewModels input/output bindings
-  - This makes the View, ViewModels less clattered, more readable and functional
-  - I chose to use this only under View, ViewModels so the inner layers won't have any dependencies in the outer layers
+  - Used mainly in View <-> ViewModels input/output bindings
+  - Makes the View, ViewModels less clattered, more readable and functional
+  - Used only under View, ViewModels so the inner layers won't have any dependencies in the outer layers
 * SnapKit
-  - I chose to use this mainly for easier debugging and easier to git merge
+  - Easier debugging and easier to git merge
+* Kingfisher
+  - Production tested and background caching of remote images
+
+# Includes
+* Dark Mode
+* Portrait / Landscape modes
+* Autoplays trailer preview
+* Offline Support
 
 # Room for improvements
 * Unit tests for ViewModels, ViewControllers
@@ -33,3 +43,4 @@ This project's architecture highlights separation of concerns.
 
 # Requirements
 * Xcode Version 11.3+ Swift 5.0+
+* Compatible with iPads / iPhones
