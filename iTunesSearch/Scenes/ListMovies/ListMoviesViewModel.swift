@@ -28,7 +28,7 @@ class ListMoviesViewModel: BaseViewModel, ViewModelType {
     )
     
     var worker: CacheMovieDecorator
-    var movies = [Movie]()
+    private var movies = [Movie]()
     
     init(worker: CacheMovieDecorator) {
         self.worker = worker
@@ -57,8 +57,28 @@ class ListMoviesViewModel: BaseViewModel, ViewModelType {
         }.disposed(by: self.disposeBag)
     }
     
+    func getMovies() -> [Movie] {
+        return self.movies
+    }
+    
+    func getTrackName(at index: Int) -> String {
+        self.movies[index].trackName
+    }
+    
+    func getPrimaryGenreName(at index: Int) -> String {
+        self.movies[index].primaryGenreName
+    }
+    
+    func getContentAdvisoryRating(at index: Int) -> String {
+        self.movies[index].contentAdvisoryRating
+    }
+    
+    func getShortDescription(at index: Int) -> String? {
+        self.movies[index].shortDescription
+    }
+    
     func getAlbumArt(at index: Int, with width: Int) -> String {
-        return self.movies[index].artworkUrl100.replacingOccurrences(of: "100x100", with: "\(width)x\(width)")
+        self.movies[index].artworkUrl100.replacingOccurrences(of: "100x100", with: "\(width)x\(width)")
     }
     
     func getTrackPrice(at index: Int) -> String {

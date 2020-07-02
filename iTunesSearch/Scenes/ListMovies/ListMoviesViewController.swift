@@ -108,20 +108,20 @@ extension ListMoviesViewController: UITableViewDataSource, UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return self.viewModel.movies.count
+        return self.viewModel.getMovies().count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: ListMoviesTableCell.reuseIdentifier, for: indexPath) as! ListMoviesTableCell
         let width = tableView.frame.width
         let rowIndex = indexPath.row
-        let movie = self.viewModel.movies[rowIndex]
-        cell.artWorkImageView.setImage(url: self.viewModel.getAlbumArt(at: rowIndex, with: Int(width)))
-        cell.trackNameLabel.text = movie.trackName
-        cell.genreLabel.text = movie.primaryGenreName
-        cell.advisoryRating.text = movie.contentAdvisoryRating
-        cell.shorDesc.attributedText = movie.shortDescription?.lineSpaced(4)
-        cell.priceLabel.text = self.viewModel.getTrackPrice(at: rowIndex)
+        let viewModel = self.viewModel
+        cell.artWorkImageView.setImage(url: viewModel.getAlbumArt(at: rowIndex, with: Int(width)))
+        cell.trackNameLabel.text = viewModel.getTrackName(at: rowIndex)
+        cell.genreLabel.text = viewModel.getPrimaryGenreName(at: rowIndex)
+        cell.advisoryRating.text = viewModel.getContentAdvisoryRating(at: rowIndex)
+        cell.shorDesc.attributedText = viewModel.getShortDescription(at: rowIndex)?.lineSpaced(4)
+        cell.priceLabel.text = viewModel.getTrackPrice(at: rowIndex)
         return cell
     }
     
@@ -132,7 +132,7 @@ extension ListMoviesViewController: UITableViewDataSource, UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        let movie = self.viewModel.movies[indexPath.row]
+        let movie = self.viewModel.getMovies()[indexPath.row]
         let showMovieScene = self.factory.makeShowMovieScene(movie: movie)
         self.show(showMovieScene, sender: nil)
     }

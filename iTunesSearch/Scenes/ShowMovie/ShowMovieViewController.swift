@@ -51,16 +51,16 @@ class ShowMovieViewController: BaseViewController<ShowMovieViewModel> {
             .observeOn(MainScheduler.instance)
             .bind { [weak self] (_) in
                 guard let self = self else { return }
-                self.playPlayer(url: self.viewModel.movie.previewUrl)
+                self.playPlayer(url: self.viewModel.getPreviewUrl())
             }.disposed(by: self.disposeBag)
     }
     
     fileprivate func setStickyHeader() {
         let width = self.view.frame.width
         self.stickyHeaderView.albumArtImageView.setImage(url: self.viewModel.getAlbumArt(with: Int(width)))
-        self.stickyHeaderView.trackNameLabel.text = self.viewModel.movie.trackName
+        self.stickyHeaderView.trackNameLabel.text = self.viewModel.getTrackName()
         self.stickyHeaderView.detailsLabel.text = self.viewModel.getFormattedDetails()
-        self.stickyHeaderView.advisoryRating.text = self.viewModel.movie.contentAdvisoryRating
+        self.stickyHeaderView.advisoryRating.text = self.viewModel.getContentAdvisoryRating()
         self.stickyHeaderView.priceLabel.text = self.viewModel.getTrackPrice()
         self.stickyHeaderView.yearLabel.text = self.viewModel.getReleaseYear()
     }
@@ -120,7 +120,7 @@ extension ShowMovieViewController: UITableViewDataSource, UITableViewDelegate {
             return cell
         case 1:
             let cell = tableView.dequeueReusableCell(withIdentifier: ShowMovieAboutTableCell.reuseIdentifier, for: indexPath) as! ShowMovieAboutTableCell
-            cell.bodyLabel.attributedText = self.viewModel.movie.longDescription.lineSpaced(4)
+            cell.bodyLabel.attributedText = self.viewModel.getLongDescription().lineSpaced(4)
             return cell
         default:
             return UITableViewCell()

@@ -21,7 +21,7 @@ class ShowMovieViewModel: BaseViewModel, ViewModelType {
     )
     
     var worker: CacheMovieDecorator
-    var movie: Movie
+    private var movie: Movie
     
     init(movie: Movie, worker: CacheMovieDecorator) {
         self.movie = movie
@@ -42,6 +42,22 @@ class ShowMovieViewModel: BaseViewModel, ViewModelType {
                 }
             }
         }.disposed(by: self.disposeBag)
+    }
+    
+    func getPreviewUrl() -> String {
+        return self.movie.previewUrl
+    }
+    
+    func getTrackName() -> String {
+        return self.movie.trackName
+    }
+    
+    func getContentAdvisoryRating() -> String {
+        return self.movie.contentAdvisoryRating
+    }
+    
+    func getLongDescription() -> String {
+        return self.movie.longDescription
     }
     
     func getAlbumArt(with width: Int) -> String {
