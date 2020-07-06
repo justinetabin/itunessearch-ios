@@ -23,7 +23,7 @@ class iTunesStoreApi: StoreApi {
     }
     
     func lookup(query: LookupQuery, completion: @escaping (StoreResult<[Movie]>?, Error?) -> Void) {
-        let request = HTTPClient.Request(path: "/lookup?id=\(query.id)", method: .GET)
+        let request = HTTPClient.Request(path: "/lookup?id=\(query.id)&country=\(query.country)", method: .GET)
         httpClient.dataTask(type: StoreResult.self, request: request) { (response) in
             completion(response.body, response.error)
         }
