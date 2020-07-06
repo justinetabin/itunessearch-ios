@@ -34,7 +34,6 @@ class PlaceholderImageView: UIImageView {
         self.addSubview(self.placeholderImageView)
         self.placeholderImageView.snp.makeConstraints { (make) in
             make.center.equalToSuperview()
-            make.width.height.equalToSuperview()
         }
     }
     

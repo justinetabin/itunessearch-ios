@@ -1,5 +1,5 @@
 //
-//  ListMoviesTableCell.swift
+//  ListMoviesCollectionCell.swift
 //  iTunesSearch
 //
 //  Created by Justine Tabin on 6/30/20.
@@ -9,8 +9,8 @@
 import Foundation
 import UIKit
 
-class ListMoviesTableCell: UITableViewCell {
-    static var reuseIdentifier = "ListMoviesTableCell"
+class ListMoviesCollectionCell: UICollectionViewCell {
+    static var reuseIdentifier = "ListMoviesCollectionCell"
     
     var artWorkImageView: PlaceholderImageView = {
         let view = PlaceholderImageView(frame: .zero)
@@ -64,8 +64,8 @@ class ListMoviesTableCell: UITableViewCell {
         return view
     }()
     
-    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
-        super.init(style: style, reuseIdentifier: reuseIdentifier)
+    override init(frame: CGRect) {
+        super.init(frame: frame)
         
         self.contentView.addSubview(self.containerView)
         self.containerView.addSubview(self.artWorkImageView)

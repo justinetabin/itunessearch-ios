@@ -7,10 +7,15 @@
 //
 
 import Foundation
+import RxRelay
 
 class CacheMovieDecorator: CacheMovieProtocols {
     var movieWorker: MovieWorker
     var movieDataStore: MovieDataStore
+    
+    var didUpsertBrowsedMovie: PublishRelay<BrowsedMovie?> {
+        return movieDataStore.didUpsertBrowsedMovie
+    }
     
     init(movieWorker: MovieWorker, movieDataStore: MovieDataStore) {
         self.movieWorker = movieWorker
@@ -47,18 +52,27 @@ class CacheMovieDecorator: CacheMovieProtocols {
         self.movieWorker.getMovie(trackId: trackId) { (movie) in
             if let movie = movie {
                 /*
-                 network -> datastore
-                         -> view
+                 network success -> datastore
+                                 -> view
                  */
                 self.movieDataStore.upsertMovie(movieToUpsert: movie) { (_) in }
+                
+                // temporarily upsert this movie directly to data store
+                // when got a movie
+                self.movieDataStore.upsertBrowsedMovie(movie: movie) { (_) in }
+                
                 completion(movie)
             } else {
                 /*
-                 network -> datastore -> view
+                 network failure -> datastore -> view
                  */
                 self.movieDataStore.getMovie(trackId: trackId) { (movie) in
                     if let movie = movie {
                         self.movieDataStore.upsertMovie(movieToUpsert: movie) { (_) in }
+                        
+                        // temporarily upsert this movie directly to data store
+                        // when got a movie
+                        self.movieDataStore.upsertBrowsedMovie(movie: movie) { (_) in }
                         completion(movie)
                     } else {
                         completion(nil)
@@ -67,9 +81,25 @@ class CacheMovieDecorator: CacheMovieProtocols {
             }
         }
     }
+    
+    func listBrowsedMovies(completion: @escaping ([BrowsedMovie]?) -> Void) {
+        self.movieWorker.listBrowsedMovies { (browsedMovies) in
+            // for now it's gonna network failure, regardless fetch from data store instead
+            self.movieDataStore.listBrowsedMovies(completion: completion)
+        }
+    }
+    
+    func upsertBrowsedMovie(movie: Movie, completion: @escaping (BrowsedMovie?) -> Void) {
+        self.movieWorker.upsertBrowsedMovie(movie: movie) { (browsedMovie) in
+            // for now it's gonna network failure, regardless upsert from data store instead
+            self.movieDataStore.upsertBrowsedMovie(movie: movie, completion: completion)
+        }
+    }
 }
 
 protocol CacheMovieProtocols {
     func searchMovies(completion: @escaping ([Movie]?) -> Void)
     func getMovie(trackId: Int, completion: @escaping (Movie?) -> Void)
+    func listBrowsedMovies(completion: @escaping ([BrowsedMovie]?) -> Void)
+    func upsertBrowsedMovie(movie: Movie, completion: @escaping (BrowsedMovie?) -> Void)
 }

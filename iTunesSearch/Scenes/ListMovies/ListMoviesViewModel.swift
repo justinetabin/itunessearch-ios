@@ -8,6 +8,7 @@
 
 import Foundation
 import RxRelay
+import RxSwift
 
 class ListMoviesViewModel: BaseViewModel, ViewModelType {
     
@@ -23,67 +24,110 @@ class ListMoviesViewModel: BaseViewModel, ViewModelType {
      View Outputs
      */
     var output = Output(
-        showMovies: PublishRelay(),
+        showMovies: BehaviorRelay(value: []),
         showLoadingActivity: PublishRelay()
     )
     
     var worker: CacheMovieDecorator
-    private var movies = [Movie]()
+    
+    private var models = [ListMoviesModel]()
     
     init(worker: CacheMovieDecorator) {
         self.worker = worker
         super.init()
         
-        self.input.viewDidLoad.bind { [weak self] (_) in
+        self.worker.didUpsertBrowsedMovie.bind { [weak self] (browsedMovie) in
             guard let self = self else { return }
-            self.output.showLoadingActivity.accept(true)
-            self.worker.searchMovies { (movies) in
-                if let movies = movies {
-                    self.movies = movies
-                    self.output.showMovies.accept(())
+            if let browsedMovie = browsedMovie {
+                if let browsedModel = self.models.first as? ListMoviesBrowsed {
+                    browsedModel.movies = browsedModel.movies.filter { (movie) -> Bool in
+                        return movie.trackId != browsedMovie.movie.trackId
+                    }
+                    browsedModel.movies.insert(browsedMovie.movie, at: 0)
+                } else {
+                    self.models.insert(ListMoviesBrowsed(movies: [browsedMovie.movie]), at: 0)
                 }
-                self.output.showLoadingActivity.accept(false)
             }
+            self.output.showMovies.accept(self.models)
+        }.disposed(by: self.disposeBag)
+        
+        self.input.viewDidLoad.bind { [weak self] (_) in
+            self?.fetchData()
         }.disposed(by: self.disposeBag)
         
         self.input.pulledToRefresh.bind { [weak self] (_) in
-            guard let self = self else { return }
-            self.worker.searchMovies { (movies) in
-                if let movies = movies {
-                    self.movies = movies
-                    self.output.showMovies.accept(())
-                }
-            }
+            self?.fetchData()
         }.disposed(by: self.disposeBag)
     }
     
-    func getMovies() -> [Movie] {
-        return self.movies
+    private func fetchData() {
+        self.output.showLoadingActivity.accept(self.models.isEmpty)
+        
+        var models = [ListMoviesModel]()
+        let semaphore = DispatchSemaphore(value: 0)
+        DispatchQueue.global().async {
+            self.worker.listBrowsedMovies { (browsedMovies) in
+                if let browsedMovies = browsedMovies, browsedMovies.count > 0 {
+                    let movies = browsedMovies.map { $0.movie }
+                    models.insert(ListMoviesBrowsed(movies: movies), at: 0)
+                }
+                semaphore.signal()
+            }
+            semaphore.wait()
+            
+            self.worker.searchMovies { (movies) in
+                if let movies = movies {
+                    models.append(ListMoviesSearched(movies: movies))
+                }
+                semaphore.signal()
+            }
+            semaphore.wait()
+            
+            self.models = models
+            self.output.showMovies.accept(models)
+            self.output.showLoadingActivity.accept(false)
+        }
     }
     
-    func getTrackName(at index: Int) -> String {
-        self.movies[index].trackName
+    func getNumberOfSections() -> Int {
+        self.output.showMovies.value.count
     }
     
-    func getPrimaryGenreName(at index: Int) -> String {
-        self.movies[index].primaryGenreName
+    func getModelType(section at: Int) -> ListMoviesModel.Type {
+        type(of: self.output.showMovies.value[at])
     }
     
-    func getContentAdvisoryRating(at index: Int) -> String {
-        self.movies[index].contentAdvisoryRating
+    func getMovie(section at: Int, row: Int) -> Movie {
+        self.output.showMovies.value[at].movies[row]
     }
     
-    func getShortDescription(at index: Int) -> String? {
-        self.movies[index].shortDescription
+    func getTrackName(section at: Int, row: Int) -> String {
+        self.getMovie(section: at, row: row).trackName
     }
     
-    func getAlbumArt(at index: Int, with width: Int) -> String {
-        self.movies[index].artworkUrl100.replacingOccurrences(of: "100x100", with: "\(width)x\(width)")
+    func getPrimaryGenreName(section at: Int, row: Int) -> String {
+        self.getMovie(section: at, row: row).primaryGenreName
     }
     
-    func getTrackPrice(at index: Int) -> String {
-        let movie = self.movies[index]
+    func getContentAdvisoryRating(section at: Int, row: Int) -> String {
+        self.getMovie(section: at, row: row).contentAdvisoryRating
+    }
+    
+    func getShortDescription(section at: Int, row: Int) -> String? {
+        self.getMovie(section: at, row: row).shortDescription
+    }
+    
+    func getAlbumArt(section at: Int, row: Int, width: Int) -> String {
+        self.getMovie(section: at, row: row).artworkUrl100.replacingOccurrences(of: "100x100", with: "\(width)x\(width)")
+    }
+    
+    func getTrackPrice(section at: Int, row: Int) -> String {
+        let movie = self.getMovie(section: at, row: row)
         return movie.trackPrice.currencyValue(currencyCode: movie.currency)
+    }
+    
+    func getNumberOfItemsIn(section at: Int) -> Int {
+        self.output.showMovies.value[at].movies.count
     }
 }
 
@@ -95,7 +139,8 @@ extension ListMoviesViewModel {
     }
     
     struct Output {
-        var showMovies: PublishRelay<()>
+        var showMovies: BehaviorRelay<[ListMoviesModel]>
         var showLoadingActivity: PublishRelay<(Bool)>
     }
 }
+

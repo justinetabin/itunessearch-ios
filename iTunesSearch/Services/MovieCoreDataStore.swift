@@ -8,10 +8,13 @@
 
 import Foundation
 import CoreData
+import RxRelay
 
 class MovieCoreDataStore: MovieDataStore {
     
     var coreDataStorage: CoreDataStorage
+    
+    var didUpsertBrowsedMovie = PublishRelay<BrowsedMovie?>()
     
     init(coreDataStorage: CoreDataStorage) {
         self.coreDataStorage = coreDataStorage
@@ -82,6 +85,51 @@ class MovieCoreDataStore: MovieDataStore {
                 }
             } catch _ {
                 completion(false)
+            }
+        }
+    }
+    
+    func listBrowsedMovies(completion: @escaping ([BrowsedMovie]?) -> Void) {
+        self.coreDataStorage.getBackgroundContext { (context) in
+            do {
+                let request: NSFetchRequest<BrowsedMovieEntity> = BrowsedMovieEntity.fetchRequest()
+                request.sortDescriptors = [NSSortDescriptor(key: "browsedAt", ascending: false)]
+                let results = try request.execute()
+                var browsedMovies = [BrowsedMovie]()
+                results.forEach { (result) in
+                    if let browsedMovie = result.toBrowsedMovie() {
+                        browsedMovies.append(browsedMovie)
+                    }
+                }
+                completion(browsedMovies)
+            } catch _ {
+                completion(nil)
+            }
+        }
+    }
+    
+    func upsertBrowsedMovie(movie: Movie, completion: @escaping (BrowsedMovie?) -> Void) {
+        self.coreDataStorage.getBackgroundContext { (context) in
+            do {
+                let request: NSFetchRequest<BrowsedMovieEntity> = BrowsedMovieEntity.fetchRequest()
+                request.predicate = NSPredicate(format: "id == %i", movie.trackId)
+                let result = try request.execute()
+                var browsedMovie: BrowsedMovie?
+                if let browsedMovieEntity = result.first {
+                    browsedMovieEntity.browsedAt = Date()
+                    browsedMovie = browsedMovieEntity.toBrowsedMovie()
+                } else {
+                    let browsedMovieEntity = BrowsedMovieEntity(browsedMovie: BrowsedMovie(id: movie.trackId,
+                                                                                           movie: movie,
+                                                                                           browsedAt: Date()),
+                                                                insertInto: context)
+                    browsedMovie = browsedMovieEntity.toBrowsedMovie()
+                }
+                try context.save()
+                self.didUpsertBrowsedMovie.accept(browsedMovie)
+                completion(browsedMovie)
+            } catch _ {
+                completion(nil)
             }
         }
     }

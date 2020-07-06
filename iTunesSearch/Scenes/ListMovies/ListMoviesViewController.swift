@@ -13,8 +13,44 @@ import RxSwift
 
 class ListMoviesViewController: BaseViewController<ListMoviesViewModel> {
     
-    var tableView: UITableView = {
-        let view = UITableView()
+    static var horizontalLayoutSection: NSCollectionLayoutSection = {
+        let item = NSCollectionLayoutItem(layoutSize: NSCollectionLayoutSize(widthDimension: .fractionalWidth(1),
+                                                                             heightDimension: .fractionalHeight(1)))
+        let group = NSCollectionLayoutGroup.horizontal(layoutSize: NSCollectionLayoutSize(widthDimension: .fractionalWidth(0.33),
+                                                                                          heightDimension: .fractionalWidth(0.33 * 1.5)),
+                                                       subitems: [item])
+        let section = NSCollectionLayoutSection(group: group)
+        section.orthogonalScrollingBehavior = .continuous
+        section.contentInsets.bottom = 50
+        return section
+    }()
+    
+    static var verticalLayoutSection: NSCollectionLayoutSection = {
+        let item = NSCollectionLayoutItem(layoutSize: NSCollectionLayoutSize(widthDimension: .fractionalWidth(1),
+                                                                             heightDimension: .fractionalHeight(1)))
+        let group = NSCollectionLayoutGroup.horizontal(layoutSize: NSCollectionLayoutSize(widthDimension: .fractionalWidth(1),
+                                                                                          heightDimension: .fractionalWidth(0.33 * 1.5)),
+                                                       subitems: [item])
+        let section = NSCollectionLayoutSection(group: group)
+        return section
+    }()
+    
+    lazy var compositionalLayout: UICollectionViewCompositionalLayout = {
+        let layout = UICollectionViewCompositionalLayout { [weak self] (sectionIndex, env) -> NSCollectionLayoutSection? in
+            guard let self = self else { return nil }
+            let type = self.viewModel.getModelType(section: sectionIndex)
+            if type == ListMoviesSearched.self {
+                return ListMoviesViewController.verticalLayoutSection
+            } else {
+                return ListMoviesViewController.horizontalLayoutSection
+            }
+        }
+        return layout
+    }()
+    
+    lazy var collectionView: UICollectionView = {
+        let view = UICollectionView(frame: .zero, collectionViewLayout: self.compositionalLayout)
+        view.backgroundColor = UIColor.systemBackground
         return view
     }()
     
@@ -29,10 +65,10 @@ class ListMoviesViewController: BaseViewController<ListMoviesViewModel> {
     }()
     
     fileprivate func setupSubviews() {
-        self.view.addSubview(self.tableView)
+        self.view.addSubview(self.collectionView)
         self.view.addSubview(self.loadingActivityIndicatorView)
         
-        self.tableView.snp.makeConstraints { (make) in
+        self.collectionView.snp.makeConstraints { (make) in
             make.edges.equalToSuperview()
         }
         
@@ -41,14 +77,12 @@ class ListMoviesViewController: BaseViewController<ListMoviesViewModel> {
         }
     }
     
-    fileprivate func setupTableView() {
-        self.tableView.refreshControl = self.pullToRefreshControl
-        self.tableView.register(ListMoviesTableCell.self, forCellReuseIdentifier: ListMoviesTableCell.reuseIdentifier)
-        self.tableView.dataSource = self
-        self.tableView.delegate = self
-        self.tableView.separatorStyle = .none
-        self.tableView.tableFooterView = UIView()
-
+    fileprivate func setupCollectionView() {
+        self.collectionView.register(ListMoviesCollectionCell.self, forCellWithReuseIdentifier: ListMoviesCollectionCell.reuseIdentifier)
+        self.collectionView.register(ListMoviesBrowsedMovieCollectionCell.self, forCellWithReuseIdentifier: ListMoviesBrowsedMovieCollectionCell.reuseIdentifier)
+        self.collectionView.refreshControl = self.pullToRefreshControl
+        self.collectionView.dataSource = self
+        self.collectionView.delegate = self
     }
     
     fileprivate func setupNav() {
@@ -64,10 +98,17 @@ class ListMoviesViewController: BaseViewController<ListMoviesViewModel> {
             .disposed(by: self.disposeBag)
         
         self.viewModel.output.showMovies
-            .observeOn(MainScheduler.instance)
-            .bind { [weak self] (_) in
-                self?.pullToRefreshControl.endRefreshing()
-                self?.tableView.reloadData()
+            .skip(1)
+            .observeOn(MainScheduler.asyncInstance)
+            .bind { [weak self] (models) in
+                guard let self = self else { return }
+                self.collectionView.reloadData()
+            }.disposed(by: self.disposeBag)
+        
+        self.viewModel.output.showMovies
+            .debounce(RxTimeInterval.seconds(1), scheduler: MainScheduler.instance)
+            .bind { (_) in
+                self.pullToRefreshControl.endRefreshing()
             }.disposed(by: self.disposeBag)
         
         self.viewModel.output.showLoadingActivity
@@ -77,20 +118,19 @@ class ListMoviesViewController: BaseViewController<ListMoviesViewModel> {
                 if loading {
                     self.loadingActivityIndicatorView.startAnimating()
                     self.loadingActivityIndicatorView.isHidden = false
-                    self.tableView.isHidden = true
+                    self.collectionView.isHidden = true
                 } else {
                     self.loadingActivityIndicatorView.stopAnimating()
                     self.loadingActivityIndicatorView.isHidden = true
-                    self.tableView.isHidden = false
+                    self.collectionView.isHidden = false
                 }
             }.disposed(by: self.disposeBag)
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         self.setupSubviews()
-        self.setupTableView()
+        self.setupCollectionView()
         self.bindViews()
         self.viewModel.input.viewDidLoad.accept(())
     }
@@ -101,39 +141,43 @@ class ListMoviesViewController: BaseViewController<ListMoviesViewModel> {
     }
 }
 
-extension ListMoviesViewController: UITableViewDataSource, UITableViewDelegate {
+extension ListMoviesViewController: UICollectionViewDataSource, UICollectionViewDelegate {
     
-    func numberOfSections(in tableView: UITableView) -> Int {
-        return 1
+    func numberOfSections(in collectionView: UICollectionView) -> Int {
+        self.viewModel.getNumberOfSections()
     }
     
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return self.viewModel.getMovies().count
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        self.viewModel.getNumberOfItemsIn(section: section)
     }
     
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: ListMoviesTableCell.reuseIdentifier, for: indexPath) as! ListMoviesTableCell
-        let width = tableView.frame.width
-        let rowIndex = indexPath.row
-        let viewModel = self.viewModel
-        cell.artWorkImageView.setImage(url: viewModel.getAlbumArt(at: rowIndex, with: Int(width)))
-        cell.trackNameLabel.text = viewModel.getTrackName(at: rowIndex)
-        cell.genreLabel.text = viewModel.getPrimaryGenreName(at: rowIndex)
-        cell.advisoryRating.text = viewModel.getContentAdvisoryRating(at: rowIndex)
-        cell.shorDesc.attributedText = viewModel.getShortDescription(at: rowIndex)?.lineSpaced(4)
-        cell.priceLabel.text = viewModel.getTrackPrice(at: rowIndex)
-        return cell
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let type = self.viewModel.getModelType(section: indexPath.section)
+        if type == ListMoviesSearched.self {
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ListMoviesCollectionCell.reuseIdentifier, for: indexPath) as! ListMoviesCollectionCell
+            let width = Int(collectionView.frame.width)
+            cell.artWorkImageView.setImage(url: self.viewModel.getAlbumArt(section: indexPath.section, row: indexPath.row, width: width))
+            cell.trackNameLabel.text = self.viewModel.getTrackName(section: indexPath.section, row: indexPath.row)
+            cell.genreLabel.text = self.viewModel.getPrimaryGenreName(section: indexPath.section, row: indexPath.row)
+            cell.advisoryRating.text = self.viewModel.getContentAdvisoryRating(section: indexPath.section, row: indexPath.row)
+            cell.shorDesc.attributedText = self.viewModel.getShortDescription(section: indexPath.section, row: indexPath.row)?.lineSpaced(4)
+            cell.priceLabel.text = self.viewModel.getTrackPrice(section: indexPath.section, row: indexPath.row)
+            return cell
+        } else if type == ListMoviesBrowsed.self {
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ListMoviesBrowsedMovieCollectionCell.reuseIdentifier, for: indexPath) as! ListMoviesBrowsedMovieCollectionCell
+            let width = Int(collectionView.frame.width)
+            cell.artWorkImageView.setImage(url: self.viewModel.getAlbumArt(section: indexPath.section, row: indexPath.row, width: width))
+            cell.trackNameLabel.text = self.viewModel.getTrackName(section: indexPath.section, row: indexPath.row)
+            return cell
+        } else {
+            return UICollectionViewCell()
+        }
     }
     
-    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        let width = Int(tableView.frame.width / 3)
-        return CGFloat(width) * 1.5
-    }
-    
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        tableView.deselectRow(at: indexPath, animated: true)
-        let movie = self.viewModel.getMovies()[indexPath.row]
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        let movie = self.viewModel.getMovie(section: indexPath.section, row: indexPath.row)
         let showMovieScene = self.factory.makeShowMovieScene(movie: movie)
         self.show(showMovieScene, sender: nil)
     }
+    
 }

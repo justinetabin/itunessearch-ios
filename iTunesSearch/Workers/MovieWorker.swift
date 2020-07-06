@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import RxRelay
 
 class MovieWorker: CacheMovieProtocols {
     var storeApi: StoreApi
@@ -28,6 +29,16 @@ class MovieWorker: CacheMovieProtocols {
             completion(result?.results.first)
         }
     }
+    
+    func listBrowsedMovies(completion: @escaping ([BrowsedMovie]?) -> Void) {
+        // no api for fetching browsed movies, but just in case it's ready
+        completion(nil)
+    }
+    
+    func upsertBrowsedMovie(movie: Movie, completion: @escaping (BrowsedMovie?) -> Void) {
+        // no api for upserting a browsed movie, but just in case it's ready
+        completion(nil)
+    }
 }
 
 protocol StoreApi {
@@ -36,8 +47,11 @@ protocol StoreApi {
 }
 
 protocol MovieDataStore {
+    var didUpsertBrowsedMovie: PublishRelay<BrowsedMovie?> { get }
     func upsertMovie(movieToUpsert: Movie, completion: @escaping (Bool) -> Void)
     func getMovie(trackId: Int, completion: @escaping (Movie?) -> Void)
     func listMovie(page: Page, completion: @escaping ([Movie]?) -> Void)
     func deleteMovie(movie: Movie, completion: @escaping (Bool) -> Void)
+    func listBrowsedMovies(completion: @escaping ([BrowsedMovie]?) -> Void)
+    func upsertBrowsedMovie(movie: Movie, completion: @escaping (BrowsedMovie?) -> Void)
 }
